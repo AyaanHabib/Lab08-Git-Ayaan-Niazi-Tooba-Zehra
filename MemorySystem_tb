@@ -1,0 +1,91 @@
+module MemorySystem_tb;
+
+    reg clk;
+    reg rst;
+    reg [31:0] address;
+    reg readEnable;
+    reg writeEnable;
+    reg [31:0] writeData;
+    reg [15:0] switches;
+    wire [31:0] readData;
+    wire [15:0] leds;
+
+    addressDecoderTop dut(
+        .clk(clk),
+        .rst(rst),
+        .address(address),
+        .readEnable(readEnable),
+        .writeEnable(writeEnable),
+        .writeData(writeData),
+        .switches(switches),
+        .readData(readData),
+        .leds(leds)
+    );
+
+    initial clk=0;
+    always #5 clk=~clk;
+
+    initial begin
+        rst=1;
+        readEnable=0;
+        writeEnable=0;
+        address=0;
+        writeData=0;
+        switches=0;
+        @(posedge clk);
+        rst=0;
+        @(posedge clk);
+
+       
+        address=32'h000;
+        writeData=32'h000000AA;
+        writeEnable=1;
+        @(posedge clk);
+        writeEnable=0;
+        @(posedge clk);
+        address=32'h001;
+        writeData=32'h000000BB;
+        writeEnable=1;
+        @(posedge clk);
+        writeEnable=0;
+
+
+        address=32'h000;
+        readEnable=1;
+        @(posedge clk);
+        @(posedge clk);
+        @(posedge clk);
+        address=32'h001;
+        @(posedge clk);
+        @(posedge clk);
+        @(posedge clk);
+        readEnable=0;
+
+        
+        address=32'h100;
+        writeData=32'h0000ABCD;
+        writeEnable=1;
+        @(posedge clk);
+        writeEnable=0;
+
+        
+        switches=16'hF0F0;
+        address=32'h200;
+        readEnable=1;
+        @(posedge clk);
+        @(posedge clk);
+        readEnable=0;
+
+      
+        address=32'h300;
+        writeEnable=1;
+        readEnable=1;
+        @(posedge clk);
+        writeEnable=0;
+        readEnable=0;
+
+        #10;
+        $finish;
+    end
+
+endmodul
